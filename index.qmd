@@ -3,6 +3,8 @@ title: "Matthew Boyd 2025 Pitch Arsenal"
 format:
   html:
     embed-resources: true
+    fig-align: center
+    df-print: paged
 echo: false
 ---
 
@@ -49,6 +51,7 @@ geom_strikezone = function(sz_top = 3.8, sz_bot = 1.1) {
 ```
 
 ```{r}
+#| lightbox: true
 location_plot = {
     ggplot(boyd) +
         aes(x = plate_x, y = plate_z) +
@@ -74,6 +77,21 @@ location_plot +
         direction = -1
     ) +
     geom_strikezone()
+```
+
+```{r}
+#| column: page
+# preview data
+boyd |> 
+    select(
+        pitch_type,
+        release_speed,
+        release_spin_rate,
+        plate_x,
+        plate_z,
+        pfx_x,
+        pfx_z
+    )
 ```
 
 Last Updated: `r format(Sys.Date(), "%Y-%m-%d")`
