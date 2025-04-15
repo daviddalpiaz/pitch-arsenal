@@ -1,0 +1,79 @@
+---
+title: "Matthew Boyd 2025 Pitch Arsenal"
+format:
+  html:
+    embed-resources: true
+echo: false
+---
+
+```{r}
+#| message: false
+# load required packages
+library("ggplot2")
+library("dplyr")
+library("ggdensity")
+```
+
+```{r}
+#| message: false
+# load data
+boyd = readRDS("boyd.rds")
+```
+
+```{r}
+# make pitch types a factor ordered by frequency
+boyd$pitch_type = factor(
+    boyd$pitch_type,
+    levels = c("FF", "CH", "SL", "CU", "SI")
+)
+```
+
+```{r}
+# create geom to visualize the strikezone
+geom_strikezone = function(sz_top = 3.8, sz_bot = 1.1) {
+    plate_width = 17 + 2 * (9 / pi)
+    sz_left = -(plate_width / 2) / 12
+    sz_right = (plate_width / 2) / 12
+    strikezone = data.frame(
+        x = c(sz_left, sz_left, sz_right, sz_right, sz_left),
+        y = c(sz_bot, sz_top, sz_top, sz_bot, sz_bot)
+    )
+    geom_path(
+        mapping = aes(.data$x, .data$y),
+        data = strikezone,
+        linewidth = 0.5,
+        linetype = 1,
+        color = "black"
+    )
+}
+```
+
+```{r}
+location_plot = {
+    ggplot(boyd) +
+        aes(x = plate_x, y = plate_z) +
+        xlim(c(-4, 4)) +
+        ylim(c(-2, 6)) +
+        xlab("") +
+        ylab("") +
+        theme_bw() +
+        coord_fixed() +
+        facet_wrap(vars(pitch_type))
+}
+
+location_plot +
+    geom_hdr(
+        method = method_kde(h = 0.75),
+        probs = c(0.90, 0.70, 0.50, 0.40, 0.30, 0.20),
+        show.legend = FALSE,
+        aes(fill = after_stat(probs)),
+        alpha = 0.75
+    )  +
+    scale_fill_brewer(
+        palette = "RdBu",
+        direction = -1
+    ) +
+    geom_strikezone()
+```
+
+Last Updated: `r format(Sys.Date(), "%Y-%m-%d")`
