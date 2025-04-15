@@ -1,0 +1,45 @@
+name: daily-render-and-publish
+
+on:
+  schedule:
+    - cron: '0 11 * * *'
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  render-quarto:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+        - name: Checkout repo
+          uses: actions/checkout@v3
+
+        - name: Setup r2u
+          uses: eddelbuettel/github-actions/r2u-setup@master
+
+        - name: Set up Quarto
+          uses: quarto-dev/quarto-actions/setup@v2
+
+        - name: Install CRAN packages
+          run: Rscript -e 'install.packages(c("ggplot2", "dplyr", "ggdensity", "remotes", "quarto"))'
+
+        - name: Install GitHub packages
+          run: Rscript -e 'remotes::install_github(repo = "saberpowers/sabRmetrics")'
+
+        - name: Run get-data.R
+          run: Rscript get-data.R
+
+        - name: Render with Quarto
+          run: quarto render
+
+        - name: Publish to GitHub Pages
+          uses: quarto-dev/quarto-actions/publish@v2
+          with:
+            render: false
+            target: gh-pages
