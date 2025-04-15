@@ -1,0 +1,10 @@
+project:
+    type: website
+    output-dir: docs
+
+website:
+    title: Matthew Boyd 2025 Pitch Arsenal
+
+format:
+    html:
+        theme: default
