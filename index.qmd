@@ -88,7 +88,9 @@ boyd |>
         release_speed,
         release_spin_rate,
         plate_x,
-        plate_z
+        plate_z,
+        pfx_x,
+        pfx_z
     )
 ```
 
